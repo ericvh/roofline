@@ -112,6 +112,11 @@ droption_t<bool> time_run(
 		"Run the target application to gather timinng information only,"
 		);
 
+droption_t<bool> dump_csv(
+		DROPTION_SCOPE_CLIENT, "dump_csv", true,
+		"also dump information to a CSV file,",
+		"also dump information to a CSV file,"
+		);
 
 static droption_t<std::string> output_folder(
 		DROPTION_SCOPE_CLIENT, "output_folder", ".",
@@ -317,6 +322,7 @@ file_t debug_file;
 file_t disassemble_file;
 #endif
 file_t out_file;
+file_t csv_file;
 
 
 #define TLS_SLOT(tls_base, enum_val) (void **)((byte *)(tls_base) + tls_offs + (enum_val))
@@ -631,6 +637,10 @@ event_thread_exit(void *drcontext){
     }
     //TODO: There should be a post execution function that iterates over all the dead thread data structures.
     //TODO: The assumption, for now, is that you have one thread only.
+	if(dump_csv.get_value()) {
+		data->save_to_csv(csv_file);
+	}
+
     dr_fprintf(out_file, "<?xml version=\"1.0\"?>\n");
     dr_fprintf(out_file, "<roofline>\n");
     data->save_to_file(out_file);
@@ -773,8 +783,14 @@ dr_client_main(client_id_t id, int argc, const char *argv[])
 	    out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
     }
     else{
+		if(dump_csv.get_value()) {
+			std::string file_name ="/roofline.csv";
+			std::string output_file = output_folder.get_value() + file_name; 
+			csv_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+		}
 	    std::string file_name = "/roofline.xml";
 	    std::string output_file = output_folder.get_value() + file_name; 
 	    out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+
     }
 }

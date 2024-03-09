@@ -53,6 +53,7 @@ class Point{
 
 		void reset();
         void dump_info(file_t out_file, std::string actual_label);
+		void dump_csv(file_t out_file, std::string actual_label);
 
 };
 

@@ -66,6 +66,7 @@ public:
   void save_point(std::string label, unsigned int line, std::string src_file);
   void clean_buffer(void);
   void save_to_file(file_t out_file);
+  void save_to_csv(file_t out_file);
 
 
   //TODO: Put back to private

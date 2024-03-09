@@ -122,3 +122,9 @@ void Point::dump_info(file_t out_file, std::string actual_label){
 	dr_fprintf(out_file, "</point>\n");
 	return;
 }
+
+void Point::dump_csv(file_t out_file, std::string actual_label){
+	if(!time_run.get_value())
+		dr_fprintf(out_file, "%s,%llu,%llu,%llu,%llu,%s,%s,%u,%u\n", actual_label.c_str(),flops,bytes,read_bytes,write_bytes,src_file_start.c_str(),src_file_end.c_str(),line_number_start,line_number_end);
+}
+
