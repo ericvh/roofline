@@ -4,7 +4,7 @@
 project(roofline)
 cmake_minimum_required(VERSION 2.8)
 
-set (CMAKE_CXX_FLAGS "-Wall -Werror=implicit-function-declaration")
+set (CMAKE_CXX_FLAGS "-Wall")
 set (CMAKE_CXX_STANDARD 11)
 file(GLOB SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "*.cpp")
 add_library(roofline SHARED main.cpp ${SOURCES})
