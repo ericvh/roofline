@@ -776,6 +776,7 @@ DR_EXPORT void dr_client_main(client_id_t id, int argc, const char *argv[]) {
       std::string file_name = "/roofline.csv";
       std::string output_file = output_folder.get_value() + file_name;
       csv_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+      dr_fprintf(csv_file, "label,thread,flops,bytes,read_bytes,write_bytes,file_start,file_end,line_start,line_end\n");
     }
     std::string file_name = "/roofline.xml";
     std::string output_file = output_folder.get_value() + file_name;

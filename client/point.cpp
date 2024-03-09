@@ -70,7 +70,7 @@ void Point::reset() {
   return;
 }
 
-void Point::dump_info(file_t out_file, std::string actual_label) {
+void Point::dump_info(file_t out_file, std::string actual_label, int thread_id) {
 
 #ifdef VALIDATE
   dr_printf("Executed FP operations are: %llu \n", flops);
@@ -92,6 +92,7 @@ void Point::dump_info(file_t out_file, std::string actual_label) {
     dr_fprintf(out_file, "<line_n_start>%u</line_n_start>\n",
                line_number_start);
     dr_fprintf(out_file, "<line_n_end>%u</line_n_end>\n", line_number_end);
+	dr_fprintf(out_file, "<thread>%u</thread>\n", thread_id);
   } else {
     double elapsed = end - start;
     dr_fprintf(out_file, "<time>%f</time>\n", elapsed);
@@ -106,10 +107,10 @@ void Point::dump_info(file_t out_file, std::string actual_label) {
   return;
 }
 
-void Point::dump_csv(file_t out_file, std::string actual_label) {
+void Point::dump_csv(file_t out_file, std::string actual_label, int thread_id) {
   if (!time_run.get_value())
-    dr_fprintf(out_file, "%s,%llu,%llu,%llu,%llu,%s,%s,%u,%u\n",
-               actual_label.c_str(), flops, bytes, read_bytes, write_bytes,
+    dr_fprintf(out_file, "%s,%u,%llu,%llu,%llu,%llu,%s,%s,%u,%u\n",
+               actual_label.c_str(), thread_id, flops, bytes, read_bytes, write_bytes,
                src_file_start.c_str(), src_file_end.c_str(), line_number_start,
                line_number_end);
 }

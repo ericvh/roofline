@@ -113,13 +113,13 @@ void ThreadData::save_to_file(file_t out_file) {
     // If it's not the first time we see a given label, let's save it with its
     // execution number
     if (search != execution_count.end()) {
-      it->dump_info(out_file, point_label + std::to_string(search->second));
+      it->dump_info(out_file, point_label + std::to_string(search->second), tid);
       execution_count[point_label] = execution_count[point_label] + 1;
     }
     // Else, let's keep track of this encounter
     else {
       execution_count[point_label] = 1;
-      it->dump_info(out_file, point_label);
+      it->dump_info(out_file, point_label, tid);
     }
     /// ELSLELELEEL
   }
@@ -138,13 +138,13 @@ void ThreadData::save_to_csv(file_t out_file) {
     // If it's not the first time we see a given label, let's save it with its
     // execution number
     if (search != execution_count.end()) {
-      it->dump_info(out_file, point_label + std::to_string(search->second));
+      it->dump_csv(out_file, point_label + std::to_string(search->second),tid);
       execution_count[point_label] = execution_count[point_label] + 1;
     }
     // Else, let's keep track of this encounter
     else {
       execution_count[point_label] = 1;
-      it->dump_csv(out_file, point_label);
+      it->dump_csv(out_file, point_label, tid);
     }
     /// ELSLELELEEL
   }

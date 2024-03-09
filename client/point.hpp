@@ -50,8 +50,8 @@ public:
   std::string get_label(void);
 
   void reset();
-  void dump_info(file_t out_file, std::string actual_label);
-  void dump_csv(file_t out_file, std::string actual_label);
+  void dump_info(file_t out_file, std::string actual_label, int thread_id);
+  void dump_csv(file_t out_file, std::string actual_label, int thread_id);
 };
 
 #endif

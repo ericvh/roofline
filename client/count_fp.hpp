@@ -1,4 +1,6 @@
 #include <math.h>
+#include <cstdint>
+#include "dr_api.h"
 
 // Counts how many Floating Point operations the given instructions
 // microarchitecturally executes.
