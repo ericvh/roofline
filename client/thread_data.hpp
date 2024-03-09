@@ -1,7 +1,6 @@
 #ifndef THREAD_DATA_H
 #define THREAD_DATA_H
 
-
 #include "dr_api.h"
 #include "point.hpp"
 #include <list>
@@ -9,22 +8,22 @@
 
 /* Allocated TLS slot offsets */
 enum {
-    MEMTRACE_TLS_OFFS_BUF_PTR,
-    MEMTRACE_TLS_COUNT, /* total number of TLS slots allocated */
+  MEMTRACE_TLS_OFFS_BUF_PTR,
+  MEMTRACE_TLS_COUNT, /* total number of TLS slots allocated */
 };
-
 
 /* Each mem_ref_t is a <type, size, addr> entry representing a memory reference
  * instruction or the reference information, e.g.:
  * - mem ref instr: { type = 42 (call), size = 5, addr = 0x7f59c2d002d3 }
  * - mem ref info:  { type = 1 (write), size = 8, addr = 0x7ffeacab0ec8 }
- *   Andrea: For the time being I'm keeping this, since it may be useful for debugging.
+ *   Andrea: For the time being I'm keeping this, since it may be useful for
+ * debugging.
  */
 typedef struct _mem_ref_t {
-    ushort size; /* mem ref size or instr length */
-    ushort type; /* r(0), w(1), or opcode (assuming 0/1 are invalid opcode) */
+  ushort size; /* mem ref size or instr length */
+  ushort type; /* r(0), w(1), or opcode (assuming 0/1 are invalid opcode) */
 #ifdef VALIDATE_VERBOSE
-    app_pc addr; /* mem ref addr or instr pc */
+  app_pc addr; /* mem ref addr or instr pc */
 #endif
 } mem_ref_t;
 
@@ -38,20 +37,20 @@ extern uint tls_offs;
 /* The maximum size of buffer for holding mem_refs. */
 #define MEM_BUF_SIZE (sizeof(mem_ref_t) * MAX_NUM_MEM_REFS)
 
+#define TLS_SLOT(tls_base, enum_val)                                           \
+  (void **)((byte *)(tls_base) + tls_offs + (enum_val))
 
-#define TLS_SLOT(tls_base, enum_val) (void **)((byte *)(tls_base) + tls_offs + (enum_val))
+#define BUF_PTR(tls_base)                                                      \
+  *(mem_ref_t **)TLS_SLOT(tls_base, MEMTRACE_TLS_OFFS_BUF_PTR)
 
-#define BUF_PTR(tls_base) *(mem_ref_t **)TLS_SLOT(tls_base, MEMTRACE_TLS_OFFS_BUF_PTR)
-
-
-
-class ThreadData{
+class ThreadData {
 public:
-   /* We store an array of points, effectively providing the capability of tracing
-    * * differents parts in the code.
-    * These different points will be then plotted together in the same plot
-    * for a better compariso
-    * * */
+  /* We store an array of points, effectively providing the capability of
+   * tracing
+   * * differents parts in the code.
+   * These different points will be then plotted together in the same plot
+   * for a better compariso
+   * * */
   std::list<Point> point_list;
 
   unsigned int tid; // Thread id
@@ -68,8 +67,7 @@ public:
   void save_to_file(file_t out_file);
   void save_to_csv(file_t out_file);
 
-
-  //TODO: Put back to private
+  // TODO: Put back to private
   mem_ref_t *buf_base;
 
 private:
@@ -78,8 +76,6 @@ private:
   // Memory buffer containig those instructions which have not yet been
   // fed to the treap.
   byte *seg_base;
-
 };
-
 
 #endif
