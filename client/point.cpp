@@ -1,4 +1,5 @@
 #include "point.hpp"
+#include <cmath>
 
 Point::Point() {
   start = 0.0;
@@ -9,6 +10,7 @@ Point::Point() {
   bytes = 0;
   write_bytes = 0;
   read_bytes = 0;
+  bzero(memhist, sizeof(memhist));
 }
 
 void Point::set_label(std::string roi_label) { label = roi_label; }
@@ -36,7 +38,16 @@ void Point::update_write_bytes(ushort bytes_accessed) {
 }
 
 void Point::update_bytes(ushort bytes_accessed) {
+  int bucket = 0;
+
   bytes = bytes + (unsigned long long)bytes_accessed;
+
+  bucket = std::sqrt(bytes_accessed);
+  DR_ASSERT(bucket<=0);
+  if(bucket>8)
+    bucket=8;
+  memhist[bucket-1]++;
+
   return;
 }
 
@@ -108,9 +119,13 @@ void Point::dump_info(file_t out_file, std::string actual_label, int thread_id) 
 }
 
 void Point::dump_csv(file_t out_file, std::string actual_label, int thread_id) {
-  if (!time_run.get_value())
-    dr_fprintf(out_file, "%s,%u,%llu,%llu,%llu,%llu,%s,%s,%u,%u\n",
+  if (!time_run.get_value()) {
+    dr_fprintf(out_file, "%s,%u,%llu,%llu,%llu,%llu,%s,%s,%u,%u",
                actual_label.c_str(), thread_id, flops, bytes, read_bytes, write_bytes,
                src_file_start.c_str(), src_file_end.c_str(), line_number_start,
                line_number_end);
+    for(int count=0; count<8; count++)
+      dr_fprintf(out_file, ",%llu", memhist[count]);
+    dr_fprintf(out_file, "\n");
+  }
 }

@@ -28,6 +28,7 @@ public:
   unsigned long long bytes;
   unsigned long long read_bytes;
   unsigned long long write_bytes;
+  unsigned long long memhist[8];
 
   // Timing information
   double start;
