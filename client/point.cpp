@@ -6,6 +6,10 @@ Point::Point() {
   end = 0.0;
   line_number_start = 0;
   line_number_end = 0;
+  fp = 0;
+  simd = 0;
+  sve = 0;
+  sme = 0;
   flops = 0;
   bytes = 0;
   write_bytes = 0;
@@ -41,12 +45,15 @@ void Point::update_bytes(ushort bytes_accessed) {
   int bucket = 0;
 
   bytes = bytes + (unsigned long long)bytes_accessed;
+  bucket = std::log2(bytes_accessed);
+  if(bucket < 0) {
+    bucket = 0;
+  } else if(bucket>7) {
+    bucket=7;
+  }
+  //dr_printf("Accessed Bytes: %u bucket %u\n", bytes_accessed,bucket);
 
-  bucket = std::sqrt(bytes_accessed);
-  DR_ASSERT(bucket<=0);
-  if(bucket>8)
-    bucket=8;
-  memhist[bucket-1]++;
+  memhist[bucket]++;
 
   return;
 }
@@ -124,8 +131,9 @@ void Point::dump_csv(file_t out_file, std::string actual_label, int thread_id) {
                actual_label.c_str(), thread_id, flops, bytes, read_bytes, write_bytes,
                src_file_start.c_str(), src_file_end.c_str(), line_number_start,
                line_number_end);
+    dr_fprintf(out_file, ",{");
     for(int count=0; count<8; count++)
-      dr_fprintf(out_file, ",%llu", memhist[count]);
-    dr_fprintf(out_file, "\n");
+      dr_fprintf(out_file, "%llu ", memhist[count]);
+    dr_fprintf(out_file, "}\n");
   }
 }

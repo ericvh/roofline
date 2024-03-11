@@ -24,6 +24,10 @@ public:
   std::string src_file_end;
   unsigned int line_number_start;
   unsigned int line_number_end;
+  unsigned long long fp;
+  unsigned long long simd;
+  unsigned long long sve;
+  unsigned long long sme;
   unsigned long long flops;
   unsigned long long bytes;
   unsigned long long read_bytes;

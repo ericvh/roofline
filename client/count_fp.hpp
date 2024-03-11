@@ -2,6 +2,13 @@
 #include <cstdint>
 #include "dr_api.h"
 
+/* check if all bits in mask are set in var */
+#define TESTALL(mask, var) (((mask) & (var)) == (mask))
+/* check if any bit in mask is set in var */
+#define TESTANY(mask, var) (((mask) & (var)) != 0)
+/* check if a single bit is set in var */
+#define TEST TESTANY
+
 // Counts how many Floating Point operations the given instructions
 // microarchitecturally executes.
 
@@ -36,8 +43,11 @@ int count_operations_per_instr(instr_t *instr) {
   case OP_frsqrts:
   case OP_fsqrt:
     return 1;
+  /* other sve math ops auto-detected*/
+  case OP_fsub:
+    return 1;
+
   // Fused Floating Point Operations
-  case OP_fmadd:
   case OP_fmla:
   case OP_fmlal:
   case OP_fmlal2:
@@ -49,8 +59,11 @@ int count_operations_per_instr(instr_t *instr) {
   case OP_fnmsub:
   case OP_fnmul:
     return 2;
-    // Vector operations TODO(Andrea)
-    // Fused Vector operations TODO(Andrea)
+  // Normal SVE FP instructions caught in calling code
+  // Fused SVE Operations
+  case OP_fmadd:
+  case OP_fmad:
+    return 2;
 
   default:
     return 0;
@@ -361,15 +374,28 @@ bool is_vector_instruction(instr_t *instr) {
   return false;
 }
 
+// TODO: this is brittle if we aren't actually looking at an SVE instruction...
+bool is_sve_instruction(instr_t *instr) {
+  const char *name = get_register_name(opnd_get_reg(instr_get_dst(instr, 0)));
+  // Check if it's a vector instruction
+  if (name[0] == 'z') {
+    return true;
+  }
+  return false;
+}
+
 // TODO: This requires a proper structure, remove these ifdef and just keep
 // those only where you really need them.
 
 #ifdef FLOATING_POINTS_ARM
 uint32_t count_fp_instr(instr_t *instr) {
   int operations_per_instr = count_operations_per_instr(instr);
+  uint category = instr_get_category(instr);
+  int op = instr_get_opcode(instr);
+  //int cat = instr_get_category(instr);
   // Check if it's a floating point operation
   if (operations_per_instr > 0) {
-    if (is_vector_instruction(instr)) {
+    if (is_vector_instruction(instr)) {  /* THIS ONLY HANDLES NEON */
       // As described in http://dynamorio.org/docs/API_BT.html under 'AArch64 IR
       // Variations', we expect to find an additional immediate source operand
       // to denote the width of vector registers.
@@ -387,13 +413,32 @@ uint32_t count_fp_instr(instr_t *instr) {
       // TODO: I expect this division to do not have any remainder. Add further
       // control?
       //  TODO: You are returning an integer, not an unsigned int 32
+      //instr_disassemble(drcontext, instr, disassembly, sizeof(disassembly));
+      //dr_printf("> DEBUG: %s, %s, %d %d\n", decode_opcode_name(op), num_elems, operations_per_instr);
       return num_elems * operations_per_instr;
-    }
-
-    else {
+    } else if (is_sve_instruction(instr) && (TESTALL(DR_INSTR_CATEGORY_FP, category))) {  /* EVH TODO: Confirm no loads */
+      int elem_width_in_bytes = 8; /* bad assumption, but will normalize everything to FP64 */
+      int reg_size =
+        (int)opnd_size_in_bytes(opnd_get_size(instr_get_dst(instr, 0)));
+      int num_elems = reg_size / elem_width_in_bytes;
+      if(operations_per_instr == 0)
+        dr_printf("> DEBUG: Known SVE FP with 0 ops per ins %s, %X\n", decode_opcode_name(op), instr_get_category(instr));
+      return num_elems * operations_per_instr;
+    } else {
       // If it's a scalar instruction, just return the number of operations
       // counted from count_operations_per_instr
       return operations_per_instr;
+    }
+  } else {
+    if (TESTALL(DR_INSTR_CATEGORY_SIMD|DR_INSTR_CATEGORY_FP|DR_INSTR_CATEGORY_MATH, category) && is_sve_instruction(instr)) {  
+      if(instr_get_opcode(instr) == OP_fcvt) // HACK
+        return 0;
+      dr_printf("> DEBUG: Unknown SVE FP: %s -- %X\n", decode_opcode_name(op), category);
+      int elem_width_in_bytes = 8; /* bad assumption, but will normalize everything to FP64 */
+      int reg_size =
+        (int)opnd_size_in_bytes(opnd_get_size(instr_get_dst(instr, 0)));
+      int num_elems = reg_size / elem_width_in_bytes;
+      return num_elems;        
     }
   }
   // else, if it's not a floating point instructions, it will return 0.
