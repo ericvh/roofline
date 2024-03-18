@@ -409,6 +409,29 @@ static void insert_save_pc(void *drcontext, instrlist_t *ilist, instr_t *where,
 }
 #endif
 
+/* Calculates the size, in bytes, of the memory read or write of instr
+ * If instr does not reference memory, or is invalid, returns 0
+ */
+uint
+my_instr_memory_reference_size(instr_t *instr)
+{
+    int i;
+    uint size = 0;
+    if (!instr_valid(instr))
+        return 0;
+    for (i = 0; i < instr_num_dsts(instr); i++) {
+        if (opnd_is_memory_reference(instr_get_dst(instr, i))) {
+            size += drutil_opnd_mem_size_in_bytes(instr_get_dst(instr, i), instr);
+        }
+    }
+    for (i = 0; i < instr_num_srcs(instr); i++) {
+        if (opnd_is_memory_reference(instr_get_src(instr, i))) {
+            size += drutil_opnd_mem_size_in_bytes(instr_get_src(instr, i), instr);
+        }
+    }
+    return size;
+}
+
 /* insert inline code to add an instruction entry into the buffer */
 static void instrument_instr(void *drcontext, instrlist_t *ilist,
                              instr_t *where) {
@@ -426,7 +449,7 @@ static void instrument_instr(void *drcontext, instrlist_t *ilist,
   }
   insert_load_buf_ptr(drcontext, ilist, where, reg_ptr);
   insert_save_size(drcontext, ilist, where, reg_ptr, reg_tmp,
-                   (ushort)instr_memory_reference_size(where));
+                   (ushort)my_instr_memory_reference_size(where));
   // Save type for
   //  0 --> Instruction will READ memory
   //  1 --> Instruction will WRITE memory

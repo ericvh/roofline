@@ -49,7 +49,7 @@ void Point::update_bytes(ushort bytes_accessed) {
   if(bucket < 0) {
     bucket = 0;
   } else if(bucket>7) {
-    bucket=7;
+    bucket = 7;
   }
   //dr_printf("Accessed Bytes: %u bucket %u\n", bytes_accessed,bucket);
 
