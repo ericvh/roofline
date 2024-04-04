@@ -84,7 +84,13 @@ void Point::reset() {
   line_number_end = 0;
   flops = 0;
   bytes = 0;
-
+  fp = 0;
+  simd = 0;
+  sve = 0;
+  sme = 0;
+  write_bytes = 0;
+  read_bytes = 0;
+  bzero(memhist, sizeof(memhist));
   return;
 }
 

@@ -95,13 +95,11 @@ droption_t<bool> write_bytes_only(DROPTION_SCOPE_CLIENT, "write_bytes_only",
                                   false, "Take into account only stored bytes",
                                   "Take into account only stored bytes");
 
-droption_t<bool>
-    time_run(DROPTION_SCOPE_CLIENT, "time_run", false,
+droption_t<bool> time_run(DROPTION_SCOPE_CLIENT, "time_run", false,
              "Run the target application to gather timinng information only,",
              "Run the target application to gather timinng information only,");
 
-droption_t<bool>
-    label_roi(DROPTION_SCOPE_CLIENT, "label_roi", false,
+droption_t<bool> label_roi(DROPTION_SCOPE_CLIENT, "label_roi", false,
              "User specified label first argument is a label,",
              "User specified label first argument is a label,");
 
