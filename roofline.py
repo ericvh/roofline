@@ -200,6 +200,7 @@ def run_roofline_client(args, app, out_dir=None):
     options = ["--output_folder " + out_dir if out_dir else ".",
                "--roi_start {}".format(args.roi_start) if args.roi_start else "",
                "--roi_end {}".format(args.roi_end) if args.roi_end else "",
+               "--label_roi {}".format(args.label_roi) if args.label_roi else "",
                "--read_bytes_only" if args.read_bytes_only else "",
                "--write_bytes_only" if args.write_bytes_only else "",
                "--trace_f {}".format(args.trace_f) if args.trace_f else "",
@@ -638,6 +639,8 @@ def main():
         '--roi_start', help='Specify the function name inside the binary which delimits the beginning of the Region of Interest (ROI)')
     record_parser.add_argument(
         '--roi_end', help='Specify the function name inside the binary which delimits the end of the Region of Interest (ROI)')
+    record_parser.add_argument(
+        '--label_roi', help='First argument of roi_start function is a string label', action='store_true')
     record_parser.add_argument(
         '--trace_f', help='Specify the function name whose whole execution will be taken into account as a Region of Interest')
     record_parser.add_argument(

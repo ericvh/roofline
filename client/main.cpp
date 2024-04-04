@@ -100,6 +100,11 @@ droption_t<bool>
              "Run the target application to gather timinng information only,",
              "Run the target application to gather timinng information only,");
 
+droption_t<bool>
+    label_roi(DROPTION_SCOPE_CLIENT, "label_roi", false,
+             "User specified label first argument is a label,",
+             "User specified label first argument is a label,");
+
 droption_t<bool> dump_csv(DROPTION_SCOPE_CLIENT, "dump_csv", true,
                           "also dump information to a CSV file,",
                           "also dump information to a CSV file,");
@@ -172,7 +177,7 @@ get_label_and_assign_id(void *wrapcxt,
 static std::string get_label(void *wrapcxt,
                              droption_t<std::string> user_defined_delimiter) {
   std::string label;
-  if (user_defined_delimiter.get_value() != "")
+  if ((user_defined_delimiter.get_value() != "")&&(!label_roi.get_value()))
     label = user_defined_delimiter.get_value();
   else
     label = std::string((const char *)drwrap_get_arg(wrapcxt, 0));
