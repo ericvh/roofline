@@ -647,12 +647,12 @@ static void event_thread_exit(void *drcontext) {
   // TODO: The assumption, for now, is that you have one thread only.
   if (dump_csv.get_value()) {
     data->save_to_csv(csv_file);
+  } else {
+    dr_fprintf(out_file, "<?xml version=\"1.0\"?>\n");
+    dr_fprintf(out_file, "<roofline>\n");
+    data->save_to_file(out_file);
+    dr_fprintf(out_file, "</roofline>\n");
   }
-
-  dr_fprintf(out_file, "<?xml version=\"1.0\"?>\n");
-  dr_fprintf(out_file, "<roofline>\n");
-  data->save_to_file(out_file);
-  dr_fprintf(out_file, "</roofline>\n");
 
 #ifdef VALIDATE
   dr_printf("> Deallocating Thread Data\n");
@@ -796,18 +796,26 @@ DR_EXPORT void dr_client_main(client_id_t id, int argc, const char *argv[]) {
 #endif
 
   if (time_run.get_value()) {
-    std::string file_name = "/roofline_time.xml";
-    std::string output_file = output_folder.get_value() + file_name;
-    out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+    if (dump_csv.get_value()) {
+      std::string file_name = "/roofline_time.csv";
+      std::string output_file = output_folder.get_value() + file_name;
+      csv_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+      dr_fprintf(csv_file, "label,thread,elapsed\n");
+    } else {
+      std::string file_name = "/roofline_time.xml";
+      std::string output_file = output_folder.get_value() + file_name;
+      out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
+    }
   } else {
     if (dump_csv.get_value()) {
       std::string file_name = "/roofline.csv";
       std::string output_file = output_folder.get_value() + file_name;
       csv_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
-      dr_fprintf(csv_file, "label,thread,flops,bytes,read_bytes,write_bytes,file_start,file_end,line_start,line_end,0,8,16,32,64,128,256,512\n");
+      dr_fprintf(csv_file, "label,thread,flops,bytes,read_bytes,write_bytes,file_start,file_end,line_start,line_end,memory_histogram\n");
+    } else {
+      std::string file_name = "/roofline.xml";
+      std::string output_file = output_folder.get_value() + file_name;
+      out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
     }
-    std::string file_name = "/roofline.xml";
-    std::string output_file = output_folder.get_value() + file_name;
-    out_file = dr_open_file(output_file.c_str(), DR_FILE_WRITE_OVERWRITE);
   }
 }

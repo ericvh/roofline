@@ -63,13 +63,13 @@ void ThreadData::save_point(std::string label, unsigned int line,
                             std::string src_file) {
   if (cur_point.get_label().compare(label) != 0) {
     if (!label.empty()) {
+#ifdef VALIDATE
       dr_printf("> WARNING: Ending ROI label '%s' does not match the starting "
                 "one '%s'\n",
                 cur_point.get_label().c_str(), label.c_str());
-                cur_point.set_label(label.c_str());
-    } else {
-      cur_point.set_label(label.c_str());
+#endif
     }
+    cur_point.set_label(label.c_str());
   }
 
 #ifdef VALIDATE

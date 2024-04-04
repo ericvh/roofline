@@ -135,5 +135,8 @@ void Point::dump_csv(file_t out_file, std::string actual_label, int thread_id) {
     for(int count=0; count<8; count++)
       dr_fprintf(out_file, "%llu ", memhist[count]);
     dr_fprintf(out_file, "}\n");
+  } else {
+    double elapsed = end - start;
+    dr_fprintf(out_file, "%s,%u,%f\n",actual_label.c_str(), thread_id, elapsed);
   }
 }
