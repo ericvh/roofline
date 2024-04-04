@@ -200,7 +200,7 @@ def run_roofline_client(args, app, out_dir=None):
     options = ["--output_folder " + out_dir if out_dir else ".",
                "--roi_start {}".format(args.roi_start) if args.roi_start else "",
                "--roi_end {}".format(args.roi_end) if args.roi_end else "",
-               "--label_roi {}".format(args.label_roi) if args.label_roi else "",
+               "--label_roi" if args.label_roi else "",
                "--read_bytes_only" if args.read_bytes_only else "",
                "--write_bytes_only" if args.write_bytes_only else "",
                "--trace_f {}".format(args.trace_f) if args.trace_f else "",
