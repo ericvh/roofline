@@ -68,7 +68,7 @@ When you specify a label as a start for a region of interest, use the same label
 
 Roofline gives you the capability to specify functions already present in the application as Region of Interest delimiters:
 
-`roofline record --roi_start <Symbol Name> --roi_end <Symbol Name> ./my_app`
+`roofline --roi_start <Symbol Name> --roi_end <Symbol Name> ./my_app`
 
 Please be careful of asking the tool to perform a meaningful operation: when the starting symbol executed, it does make sense to be sure and ending symbol will eventually be executed as well, in a 1:1 ratio.
 
@@ -76,49 +76,26 @@ Pay attention: if the specified symbols are executed multiple times, the tool wi
 
 The tool also provides the capability of defining a single function as a region of interest:
 
-`roofline record --trace_f <Symbol Name> ./my_app`
+`roofline --trace_f <Symbol Name> ./my_app`
 
 
 ## Record
 In order to use the tool for recording:
 
-`roofline record -o <output_folder_to_store_the_results>  -- <target_appliaction> <target application flag>`
+`roofline -o <output_folder_to_store_the_results>  -- <target_appliaction> <target application flag>`
 
 If you are interested into a more granular recording, the tool supports the '--[read/write]_bytes_only' flag which, if specified, will make the instrumentation client gather only bytes read or written respectively.
 
 
 The tool will create two different files in the specified output directory reporting all the information gathered:
 
-* roofline.xml - This file contains information about bytes accessed by all the bits of code falling into the specified regions of interest.
-* roofline_time.xml - This file contains timinig information about all thei bits of code falling into the specified regions of interest.
-
+* roofline.csv - This file contains information about bytes accessed by all the bits of code falling into the specified regions of interest.
+* roofline_time.csv - This file contains timinig information about all thei bits of code falling into the specified regions of interest.
 
 ## Report
 
-Once you've recorded you application, you'll definitely want to actually see the plot being drawn:
-
-`rooofline report -i <folder_created_on_roofline_record> --line <hostame>_<PRECISION>`
-
-`-i` corresponds to the recorded application performance, while `--line` is instead the ERT recorded roofline-like line representing the machine capabilities.
-
-Multiple `-i` or `-line` targets can be specified in such a way that you'll be able to compare different regions of interests under potentially different configurations, when potentially run on top of different machines.
-
-This command will use the previously generated roofline.xml and roofline_time.xml files to draw a plot for you.
-If you are using a remote machine/server and don't have any graphics packages there, the tool provides you a quick report on the command line you'll be able to see just after having executed the command.
-
-This command also provides another output called roofline.gnu which you can use to get a better plot:
-
-
-`gnuplot roofline.gnu`
-
-This will produce a roofline.ps file in the current directory, which is a [PostScript](https://en.wikipedia.org/wiki/PostScript) file for the final plot.
-
-
-A suggested way to be able to see the actual plot is to use [Okular](https://okular.kde.org/):
-
-`okular roofline.ps`
-
-
+The built in reporting and ERT roofline gathering features have been removed from this version to simplify the code.
+A seperate jupyter notebook will be provided to help process results.
 
 ## Beta Release Notes
 
