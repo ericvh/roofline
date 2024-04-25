@@ -69,6 +69,7 @@ int tls_idx;
 
 // Region of interest data structures.
 
+/* EVH TODO: don't these need to be per-thread? */
 static bool in_roi = false;
 static int roi_start_detected = 0;
 static int roi_end_detected = 0;
@@ -125,6 +126,11 @@ static droption_t<std::string>
             "be treated as demarker for the Region of Interest",
             "Specify a function name inside the target application which will "
             "be treated as demarker for the Region of Interest");
+
+static droption_t<std::string>
+    loi(DROPTION_SCOPE_CLIENT, "loi", "",
+            "Label of Interest",
+            "Specify a label of interest to filter built in ROI functions");
 
 static droption_t<std::string>
     trace_f(DROPTION_SCOPE_CLIENT, "trace_f", "",
@@ -207,6 +213,12 @@ get_src_file_name(void *wrapcxt,
 }
 
 static void event_roi_init(void *wrapcxt, DR_PARAM_OUT void **user_data) {
+  std::string detected_label = get_label(wrapcxt, roi_end);
+  std::string label_of_interest = loi.get_value();
+  // Check if the label of interest exists
+  if (!label_of_interest.empty() && detected_label != label_of_interest) {
+    return;
+  }
 #ifdef VALIDATE
   dr_printf(">> ROI Start <<\n");
 #endif
@@ -273,7 +285,12 @@ static void symbol_roi_end(void *wrapcxt, DR_PARAM_OUT void *user_data) {
 }
 
 static void event_roi_end(void *wrapcxt, DR_PARAM_OUT void **user_data) {
-
+  std::string detected_label = get_label(wrapcxt, roi_end);
+  std::string label_of_interest = loi.get_value();
+  // Check if the label of interest exists
+  if (!label_of_interest.empty() && detected_label != label_of_interest) {
+    return;
+  }
 #ifdef VALIDATE
   dr_printf(">> ROI End <<\n");
 #endif

@@ -64,6 +64,7 @@ def run_roofline_client(args, app, out_dir=None):
                "--read_bytes_only" if args.read_bytes_only else "",
                "--write_bytes_only" if args.write_bytes_only else "",
                "--trace_f {}".format(args.trace_f) if args.trace_f else "",
+               "--loi {}".format(args.loi) if args.loi else "",
                "--calls_as_separate_roi" if args.calls_as_separate_roi else ""]
 
     options.append("--dump_csv")
@@ -145,6 +146,8 @@ def main():
         '--label_roi', help='First argument of roi_start function is a string label', action='store_true')
     record_parser.add_argument(
         '--trace_f', help='Specify the function name whose whole execution will be taken into account as a Region of Interest')
+    record_parser.add_argument(
+        '--loi', help='Specify the label whose whole execution will be taken into account as a Region of Interest (optional)')    
     record_parser.add_argument(
         '--calls_as_separate_roi', help='To be used only after specifying --trace_f, takes into account each function execution as a different ROI', action='store_true')
     record_parser.add_argument(
