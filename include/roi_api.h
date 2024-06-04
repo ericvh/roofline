@@ -8,7 +8,7 @@ void _RoiEnd(const char* label, unsigned int __line, const char* __file) __attri
 
 // Define a compiler barrier to prevent compiler reordering
 void _RoiStart(const char* label, unsigned int __line, const char* __file){
-}
+}   
 
 // Define a compiler barrier to prevent compiler reordering
 void _RoiEnd(const char* label, unsigned int __line, const char* __file){
